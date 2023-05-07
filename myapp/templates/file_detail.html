@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {% if rows %}
+        <table style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+            <thead>
+                <tr>
+                    {% for item in rows.0 %}
+                        <th style="padding: 10px; border: 1px solid #ddd;">{{ item }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+            {% for i in rows %}
+                <tr {% cycle "class='odd'" "class='even'" %}>
+                    {% for item in i %}
+                        <td style="padding: 10px; border: 1px solid #ddd;">{{ item }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <!-- <p>abcd</p> -->
+        <img src="{{ MEDIA_URL }}{{ file.file.url }}" alt="{{ file.name }}">
+    {% endif %}
+{% endblock %}
