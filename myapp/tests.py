@@ -5,7 +5,7 @@ from .models import UploadedFile
 class UploadedFileModelTests(TestCase):
     def test_file_type(self):
         file = UploadedFile.objects.create(file='test.csv')
-        self.assertEqual(file.file_type, 'csv')
+        self.assertEqual(file.local_file_type, 'csv')
 
 class FileUploadTests(TestCase):
     def test_upload_csv(self):
@@ -14,7 +14,7 @@ class FileUploadTests(TestCase):
         self.assertRedirects(response, reverse('file_list'))
         self.assertEqual(UploadedFile.objects.count(), 1)
         file = UploadedFile.objects.first()
-        self.assertEqual(file.file_type, 'csv')
+        self.assertEqual(file.local_file_type, 'csv')
 
     def test_upload_image(self):
         with open('test.png', 'rb') as f:
@@ -22,4 +22,4 @@ class FileUploadTests(TestCase):
         self.assertRedirects(response, reverse('file_list'))
         self.assertEqual(UploadedFile.objects.count(), 1)
         file = UploadedFile.objects.first()
-        self.assertEqual(file.file_type, 'image')
+        self.assertEqual(file.local_file_type, 'image')

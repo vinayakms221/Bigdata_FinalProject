@@ -3,11 +3,24 @@ from django.db import models
 
 class UploadedFile(models.Model):
     file = models.FileField(upload_to='uploads/')
-    file_type = models.CharField(max_length=10, choices=(('json', 'JSON'), ('csv', 'CSV'), ('image', 'Image')))
+    local_file_type = models.CharField(max_length=10, choices=(('json', 'JSON'), ('csv', 'CSV'), ('image', 'Image'), ('pdf', 'Document')), blank=True, null=True)
+    url_file_type = models.CharField(max_length=10, choices=(('mongo', 'MONGO'), ('sql', 'SQL')),blank=True, null=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
+    file_url = models.CharField(max_length=255, blank=True, null=True)
+    username = models.CharField(max_length=255, blank=True, null=True)
+    password = models.CharField(max_length=255, blank=True, null=True)
+
+    # def __str__(self):
+    #     retString = ""
+    #     if self.file:
+    #         retString += str(self.file)
+    #     else:
+    #         retString += "None"
+    #     print(f"{retString}")
+
 
     def save(self, *args, **kwargs):
-        self.file_type = self.get_file_type(self.file.name)
+        self.local_file_type = self.get_file_type(self.file.name)
         super(UploadedFile, self).save(*args, **kwargs)
 
     def get_file_type(self, filename):

@@ -19,7 +19,7 @@
       {% for file in files %}
         <tr>
           <td><a href="{% url 'file_detail' pk=file.pk %}" class="list-group-item list-group-item-action"></td>
-          <td>{{ file.file_type|title }}</td>
+          <td>{{ file.local_file_type|title }}</td>
           <td>{{ file.file.size|filesizeformat }}</td>
           <td>{{ file.uploaded_at|date:"M d, Y H:i:s" }}</td>
         </tr>

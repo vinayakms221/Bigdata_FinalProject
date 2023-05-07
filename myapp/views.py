@@ -16,26 +16,59 @@ def file_list(request):
     return render(request, 'file_list.html', {'files': files})
 
 def upload_file(request):
+    # form = None
+    print(request.POST)
+    # print("abc")
     if request.method == 'POST':
-        form = UploadFileForm(request.POST, request.FILES)
-        if form.is_valid():
-            file_type = form.cleaned_data['file_type']
-            print(file_type)
-            uploaded_file = request.FILES['file']
-            fs = FileSystemStorage(location=settings.MEDIA_ROOT)
-            filename = fs.save(uploaded_file.name, uploaded_file)
-            file_url = fs.url(filename)
-            uploaded_file_obj = UploadedFile(file=filename, file_type=file_type)
-            uploaded_file_obj.save()
+        print("post", request.POST['upload_option'])
+        if 'local' == request.POST['upload_option']:
+            
+            form = UploadFileForm(request.POST, request.FILES)
+            print("local", form, form.is_valid())
+            if form.is_valid():
+                file_type = form.cleaned_data['local_file_type']
+                uploaded_file = request.FILES['file']
+                fs = FileSystemStorage(location=settings.MEDIA_ROOT)
+                filename = fs.save(uploaded_file.name, uploaded_file)
+                file_url = fs.url(filename)
+                uploaded_file_obj = UploadedFile(file=filename, local_file_type=file_type)
+                uploaded_file_obj.save()
+                return redirect('file_list')
+        elif 'url' == request.POST['upload_option']:
+            print("url")
+            url = request.POST['file_url']
+            file_type = request.POST['url_file_type']
+            username = request.POST['username']
+            password = request.POST['password']
+            print(username)
+            # uploaded_file_obj = UploadedFile(file=url, url_file_type=file_type)
+            # uploaded_file_obj.save()
             return redirect('file_list')
     else:
         form = UploadFileForm()
     return render(request, 'upload_file.html', {'form': form})
 
+# def upload_file(request):
+#     if request.method == 'POST':
+#         form = UploadFileForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             file_type = form.cleaned_data['file_type']
+#             print(file_type)
+#             uploaded_file = request.FILES['file']
+#             fs = FileSystemStorage(location=settings.MEDIA_ROOT)
+#             filename = fs.save(uploaded_file.name, uploaded_file)
+#             file_url = fs.url(filename)
+#             uploaded_file_obj = UploadedFile(file=filename, file_type=file_type)
+#             uploaded_file_obj.save()
+#             return redirect('file_list')
+#     else:
+#         form = UploadFileForm()
+#     return render(request, 'upload_file.html', {'form': form})
+
 
 def file_detail(request, pk):
     file = get_object_or_404(UploadedFile, pk=pk)
-    if file.file_type == 'csv':
+    if file.local_file_type == 'csv':
         # content = file.file.read().decode('ISO-8859-1')
         # # use pandas to read the CSV data and create a DataFrame
         # df = pd.read_csv(io.StringIO(content))
@@ -46,7 +79,7 @@ def file_detail(request, pk):
         reader = csv.reader(io.StringIO(content), delimiter=';')
         rows = [row for row in reader]
         # print(rows)
-        print(file.file_type)
+        print(file.local_file_type)
         return render(request, 'file_detail.html', {'file': file, 'rows': rows})
     # elif file.file_type in ['jpg', 'jpeg', 'png', 'gif']:
     else:
