@@ -4,7 +4,7 @@ from django.db import models
 class UploadedFile(models.Model):
     file = models.FileField(upload_to='uploads/')
     local_file_type = models.CharField(max_length=10, choices=(('json', 'JSON'), ('csv', 'CSV'), ('image', 'Image'), ('pdf', 'Document')), blank=True, null=True)
-    url_file_type = models.CharField(max_length=10, choices=(('mongo', 'MONGO'), ('sql', 'SQL')),blank=True, null=True)
+    url_file_type = models.CharField(max_length=10, choices=(('sql', 'SQL'), ('nosql', 'NOSQL')),blank=True, null=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     file_url = models.CharField(max_length=255, blank=True, null=True)
     username = models.CharField(max_length=255, blank=True, null=True)
