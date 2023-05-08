@@ -8,12 +8,37 @@ from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 import os
 import io
+import numpy as np
+import matplotlib.pyplot as plt
 
-
+def sma(db, cols, window_size):   
+    # spark = SparkSession.builder.appName("LoadData").getOrCreate()
+    # df = spark.read.csv(db, header=True, inferSchema=True)
+    print(db)
+    return db, cols, window_size
+    # time_rows = df.select(cols).collect()
+    # time = [row[cols] for row in time_rows]
+        
+    # l = len(time)
+    # sma = np.cumsum(time, dtype=float)
+    # sma[window_size:] = sma[window_size:] - sma[:-window_size]
+    # sma = sma[window_size - 1:] / window_size
+    # sma = sma.tolist()
+    # for i in range(0,l-len(sma)):
+    #     sma.insert(0,None)
+    # return sma
 
 def file_list(request):
     files = UploadedFile.objects.all()
     return render(request, 'file_list.html', {'files': files})
+
+def generate_plot(x,y):
+    plt.plot(x,y)
+    file_path = os.path.join(settings.MEDIA_ROOT, 'plot1.png')
+    plt.savefig(file_path)    # fs = FileSystemStorage(location=settings.MEDIA_ROOT)
+    # filename = fs.save("plot1.png", img)
+
+
 
 def upload_file(request):
     # form = None
@@ -33,7 +58,16 @@ def upload_file(request):
                 file_url = fs.url(filename)
                 uploaded_file_obj = UploadedFile(file=filename, local_file_type=file_type)
                 uploaded_file_obj.save()
-                print(request.POST['conversion_type'])
+
+                if (request.POST['conversion_type']== 'TimeSeries'):
+                    if (request.POST['model_type']== 'MovingAvg'):
+                        print(sma(file_url,request.POST['mavg_column_name'],int(request.POST['window'])))
+                        x=[1,2,3,4,5]
+                        y=[10,20,30,40,50]
+                        generate_plot(x,y)
+
+
+                # print(request.POST['conversion_type'])
                 return redirect('file_list')
         elif 'url' == request.POST['upload_option']:
             print("url")

@@ -6,22 +6,26 @@
 {% block content %}
   <h2>Uploaded Files</h2>
   <p><a href="{% url 'upload_file' %}">Upload a new file</a></p>
-  <table>
+  <table class="table table-bordered">
     <thead>
       <tr>
         <th>File Name</th>
         <th>File Type</th>
         <th>File Size</th>
         <th>Uploaded At</th>
+        <th></th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
       {% for file in files %}
         <tr>
-          <td><a href="{% url 'file_detail' pk=file.pk %}" class="list-group-item list-group-item-action"></td>
+          <td><a href="{% url 'file_detail' pk=file.pk %}" class="list-group-item list-group-item-action" >{{ file.file.name }}</td>
           <td>{{ file.local_file_type|title }}</td>
           <td>{{ file.file.size|filesizeformat }}</td>
           <td>{{ file.uploaded_at|date:"M d, Y H:i:s" }}</td>
+          <td><a href="{% url 'file_detail' pk=file.pk %}" class="btn btn-primary">Convert</a></td>
+          <td><a href="{% url 'file_detail' pk=file.pk %}" class="btn btn-primary">Visualize</a></td>
         </tr>
       {% endfor %}
       {% if files|length == 0 %}
