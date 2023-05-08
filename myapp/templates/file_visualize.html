@@ -1,24 +1,14 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h2>Upload a File</h2>
+  <h2>Visualize File</h2>
+
+  {% if file.local_file_type == 'csv' %}
+
   <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <!-- {{ form.as_p }} -->
-    <label for="id_upload_option">Upload option:</label>
-    <select name="upload_option" id="id_upload_option" onchange="handleUploadOption(this.value)">
-        <option value="local">Local</option>
-        <option value="url">URL</option>
-    </select>
-    <br><br>
-    <div id="local-upload" style="display:none">
-        <label for="id_local_file_type">File type:</label>
-        <select name="local_file_type" id="id_local_file_type" onchange="FiletypeOption(this.value)">
-            <option value="null">----</option>
-            <option value="csv">CSV</option>
-            <option value="json">JSON</option>
-            <option value="image">Image</option>
-        </select>
+    
 
         <!-- <div id="image_upload" style="display:none">
           <label for="conversion">Choose Operation:</label>
@@ -29,7 +19,7 @@
           </select>
           </div> -->
 
-        <div id="csv_div" style="display:none">
+        <!-- <div id="csv_div" style="display:none"> -->
 
 
         <div id="csv_options" style="display:none">
@@ -128,13 +118,14 @@
           <input type="number" name="d_value" placeholder="Enter d value">
         </div>
       </div>
-    </div>
+    <!-- </div> -->
         
 
         <br><br>
-        <input type="file" name="file">
-    </div>
-    <div id="url-upload" style="display:none">
+        <!-- <input type="file" name="file"> -->
+        <button type="submit">Submit</button>
+      </div>
+    <!-- <div id="url-upload" style="display:none">
         <label for="id_url_file_type">File type:</label>
         <select name="url_file_type" id="id_url_file_type">
             <option value="null">----</option>
@@ -145,30 +136,34 @@
         <input type="text" name="file_url" placeholder="Enter file URL">
         <input type="text" name="username" placeholder="Enter Username">
         <input type="text" name="password" placeholder="Enter Password">
-    </div>
+    </div> -->
     <br><br>
-    <button type="submit">Upload</button>
   </form>
+
+  {% else %}
+        <!-- <p>abcd</p> -->
+        <img src="{{ MEDIA_URL }}{{ file.file.url }}" alt="{{ file.name }}">
+  {% endif %}
   
   <script>
-    document.getElementById("local-upload").style.display = "block";
+    // document.getElementById("local-upload").style.display = "block";
     document.getElementById("csv_options").style.display = "block";
-    // document.getElementById("time_series").style.display = "block";
-    // document.getElementById("moving_avg").style.display = "block";
-    // document.getElementById("TS_div").style.display = "block";
+    document.getElementById("time_series").style.display = "block";
+    document.getElementById("moving_avg").style.display = "block";
+    document.getElementById("TS_div").style.display = "block";
     // document.getElementById("csv_div").style.display = "block";
 
     
 
-      function handleUploadOption(value) {
-          if (value == "local") {
-              document.getElementById("local-upload").style.display = "block";
-              document.getElementById("url-upload").style.display = "none";
-          } else {
-              document.getElementById("local-upload").style.display = "none";
-              document.getElementById("url-upload").style.display = "block";
-          }
-      }
+      // function handleUploadOption(value) {
+      //     if (value == "local") {
+      //         document.getElementById("local-upload").style.display = "block";
+      //         document.getElementById("url-upload").style.display = "none";
+      //     } else {
+      //         document.getElementById("local-upload").style.display = "none";
+      //         document.getElementById("url-upload").style.display = "block";
+      //     }
+      // }
 
       // function FiletypeOption(value) {
       //     if (value == "csv") {
@@ -260,4 +255,7 @@
           }
       }
   </script>
+  
+  
+  
 {% endblock %}

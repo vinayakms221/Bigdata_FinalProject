@@ -20,12 +20,19 @@
     <tbody>
       {% for file in files %}
         <tr>
-          <td><a href="{% url 'file_detail' pk=file.pk %}" class="list-group-item list-group-item-action" >{{ file.file.name }}</td>
-          <td>{{ file.local_file_type|title }}</td>
+          <!-- <td><a href="{% url 'file_detail' pk=file.pk %}" class="list-group-item list-group-item-action" >{{ file.file.name }}</td> -->
+          <!-- <td>{{ file.local_file_type|title }}</td> -->
+          {% if file.local_file_type == 'csv' %}
+            <td><a href="{% url 'file_detail' pk=file.pk %}">{{ file.file }}</a></td>
+            <td>{{ file.local_file_type|title }}</td>
+          {% elif file.local_file_type == 'image' %}
+            <td><a href="{% url 'file_detail' pk=file.pk %}">{{ file.file }}</a></td>
+            <td>Folder</td>
+          {% endif %}
           <td>{{ file.file.size|filesizeformat }}</td>
           <td>{{ file.uploaded_at|date:"M d, Y H:i:s" }}</td>
-          <td><a href="{% url 'file_detail' pk=file.pk %}" class="btn btn-primary">Convert</a></td>
-          <td><a href="{% url 'file_detail' pk=file.pk %}" class="btn btn-primary">Visualize</a></td>
+          <td><a href="{% url 'file_convert' pk=file.pk %}" class="btn btn-primary">Convert</a></td>
+          <td><a href="{% url 'file_visualize' pk=file.pk %}" class="btn btn-primary">Visualize</a></td>
         </tr>
       {% endfor %}
       {% if files|length == 0 %}

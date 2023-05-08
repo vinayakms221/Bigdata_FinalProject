@@ -10,6 +10,8 @@ import os
 import io
 import numpy as np
 import matplotlib.pyplot as plt
+import zipfile
+
 
 def sma(db, cols, window_size):   
     # spark = SparkSession.builder.appName("LoadData").getOrCreate()
@@ -51,23 +53,38 @@ def upload_file(request):
             form = UploadFileForm(request.POST, request.FILES)
             # print("local", form, form.is_valid())
             if form.is_valid():
+                print("form is valid")
                 file_type = form.cleaned_data['local_file_type']
-                uploaded_file = request.FILES['file']
-                fs = FileSystemStorage(location=settings.MEDIA_ROOT)
-                filename = fs.save(uploaded_file.name, uploaded_file)
-                file_url = fs.url(filename)
-                uploaded_file_obj = UploadedFile(file=filename, local_file_type=file_type)
-                uploaded_file_obj.save()
+                if(file_type == 'image'):
+                    uploaded_file = request.FILES['file']
+                    fs = FileSystemStorage(location=settings.MEDIA_ROOT)
+                    # with zipfile.ZipFile(uploaded_file, 'r') as zip_ref:
+                        # zip_ref.extractall(settings.MEDIA_ROOT)
+                    filename = fs.save(uploaded_file.name, uploaded_file)
+                    file_url = fs.url(filename)
+                    uploaded_file_obj = UploadedFile(file=filename, local_file_type=file_type)
+                    uploaded_file_obj.save()
+                    
 
-                if (request.POST['conversion_type']== 'TimeSeries'):
-                    if (request.POST['model_type']== 'MovingAvg'):
-                        print(sma(file_url,request.POST['mavg_column_name'],int(request.POST['window'])))
-                        x=[1,2,3,4,5]
-                        y=[10,20,30,40,50]
-                        generate_plot(x,y)
+                else:
+                    file_type = form.cleaned_data['local_file_type']
+                    uploaded_file = request.FILES['file']
+                    fs = FileSystemStorage(location=settings.MEDIA_ROOT)
+                    filename = fs.save(uploaded_file.name, uploaded_file)
+                    file_url = fs.url(filename)
+                    print(file_url)
+                    uploaded_file_obj = UploadedFile(file=filename, local_file_type=file_type)
+                    uploaded_file_obj.save()
+
+                    # if (request.POST['conversion_type']== 'TimeSeries'):
+                    #     if (request.POST['model_type']== 'MovingAvg'):
+                    #         print(sma(file_url,request.POST['mavg_column_name'],int(request.POST['window'])))
+                    #         x=[1,2,3,4,5]
+                    #         y=[10,20,30,40,50]
+                    #         generate_plot(x,y)
 
 
-                # print(request.POST['conversion_type'])
+                print(request.POST['local_file_type'])
                 return redirect('file_list')
         elif 'url' == request.POST['upload_option']:
             print("url")
@@ -120,6 +137,28 @@ def file_detail(request, pk):
     else:
         print(file.file)
         return render(request, 'file_detail.html', {'file': file})
+    
+
+    
+def file_convert(request, pk):
+    file = get_object_or_404(UploadedFile, pk=pk)
+    print(request.POST)
+
+
+    return render(request, 'file_convert.html', {'file': file})
+
+
+
+def file_visualize(request, pk):
+    file = get_object_or_404(UploadedFile, pk=pk)
+    print(request.POST)
+    
+
+
+    return render(request, 'file_visualize.html', {'file': file})
+
+
+
 
 
 
