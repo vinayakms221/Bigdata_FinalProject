@@ -123,7 +123,9 @@
 
         <br><br>
         <!-- <input type="file" name="file"> -->
+        <!-- <button type="submit" onclick="displayImage()">Submit</button> -->
         <button type="submit">Submit</button>
+
       </div>
     <!-- <div id="url-upload" style="display:none">
         <label for="id_url_file_type">File type:</label>
@@ -138,6 +140,9 @@
         <input type="text" name="password" placeholder="Enter Password">
     </div> -->
     <br><br>
+    
+    <!-- <img id="plot" src="media\plot.png"  style="display: none;"> -->
+
   </form>
 
   {% else %}
@@ -178,6 +183,12 @@
       //     }
       // }
 
+    //   function displayImage() {
+		// 	var img = document.getElementById("plot");
+    //   img.style.display = "block";
+		// 	img.src = "media/plot.png";
+      
+		// }
       function csvtypeOption(value) {
           if (value == "TimeSeries") {
               document.getElementById("time_series").style.display = "block";

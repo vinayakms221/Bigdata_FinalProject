@@ -11,7 +11,11 @@ class UploadedFile(models.Model):
     password = models.CharField(max_length=255, blank=True, null=True)
 
     conversion_type = models.CharField(max_length=10, choices=(('TimeSeries', 'Time Series'), ('ToSQL', 'To SQL'), ('LinearReg', 'Linear Regression')), blank=True, null=True)
-    collection_name = models.CharField(max_length=255, blank=True, null=True)
+    convert_type = models.CharField(max_length=10, choices=(('ToSQL', 'To SQL'), ('ToNOSQL', 'To NOSQL')), blank=True, null=True)
+
+    collection_name_sql = models.CharField(max_length=255, blank=True, null=True)
+    collection_name_nosql = models.CharField(max_length=255, blank=True, null=True)
+
     X_axis = models.CharField(max_length=255, blank=True, null=True)
     Y_axis = models.CharField(max_length=255, blank=True, null=True)
 

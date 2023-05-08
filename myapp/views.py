@@ -36,7 +36,7 @@ def file_list(request):
 
 def generate_plot(x,y):
     plt.plot(x,y)
-    file_path = os.path.join(settings.MEDIA_ROOT, 'plot1.png')
+    file_path = os.path.join(settings.MEDIA_ROOT, 'plot.png')
     plt.savefig(file_path)    # fs = FileSystemStorage(location=settings.MEDIA_ROOT)
     # filename = fs.save("plot1.png", img)
 
@@ -149,13 +149,35 @@ def file_convert(request, pk):
 
 
 
+
+
 def file_visualize(request, pk):
-    file = get_object_or_404(UploadedFile, pk=pk)
     print(request.POST)
-    
+    file = get_object_or_404(UploadedFile, pk=pk)
 
+    # print("abc")
+    if request.method == 'POST':
+        print("post", request.POST['conversion_type'])
+        if (request.POST['conversion_type']== 'TimeSeries'):
+                if (request.POST['model_type']== 'MovingAvg'):
+                    # print(sma(file_url,request.POST['mavg_column_name'],int(request.POST['window'])))
+                    x=[1,2,3,4,5]
+                    y=[10,20,30,40,80]
+                    generate_plot(x,y)
 
-    return render(request, 'file_visualize.html', {'file': file})
+            
+        form = UploadFileForm(request.POST, request.FILES)
+        # print("local", form, form.is_valid())
+        
+        return redirect('plot_img')
+        
+    else:
+        form = UploadFileForm()
+    # return render(request, 'upload_file.html', {'form': form})
+    return render(request, 'file_visualize.html', {'file': file,'form': form })
+
+def plot_img(request):
+    return render(request, 'plot_img.html')
 
 
 

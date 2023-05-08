@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from myapp.views import file_list, upload_file, file_detail, file_convert, file_visualize
+from myapp.views import file_list, upload_file, file_detail, file_convert, file_visualize, plot_img
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -26,5 +26,6 @@ urlpatterns = [
     path('upload/', upload_file, name='upload_file'),
     path('uploads/<int:pk>/', file_detail, name='file_detail'),
     path('convert/<int:pk>/', file_convert, name='file_convert'),
-    path('visualize/<int:pk>/', file_visualize, name='file_visualize')
+    path('visualize/<int:pk>/', file_visualize, name='file_visualize'),
+    path('plot/', plot_img, name='plot_img'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
