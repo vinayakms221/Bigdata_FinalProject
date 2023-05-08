@@ -10,6 +10,25 @@ class UploadedFile(models.Model):
     username = models.CharField(max_length=255, blank=True, null=True)
     password = models.CharField(max_length=255, blank=True, null=True)
 
+    conversion_type = models.CharField(max_length=10, choices=(('TimeSeries', 'Time Series'), ('ToSQL', 'To SQL'), ('LinearReg', 'Linear Regression')), blank=True, null=True)
+    collection_name = models.CharField(max_length=255, blank=True, null=True)
+    X_axis = models.CharField(max_length=255, blank=True, null=True)
+    Y_axis = models.CharField(max_length=255, blank=True, null=True)
+
+    column_name = models.CharField(max_length=255, blank=True, null=True)
+    data_column_name = models.CharField(max_length=255, blank=True, null=True)
+    window = models.IntegerField(blank=True, null=True)
+    lag_amt = models.IntegerField(blank=True, null=True)
+    lead_amt = models.IntegerField(blank=True, null=True)
+    roll_amt = models.IntegerField(blank=True, null=True)
+    lag1_amt = models.IntegerField(blank=True, null=True)
+    lag2_amt = models.IntegerField(blank=True, null=True)
+    p_value = models.IntegerField(blank=True, null=True)
+    q_value = models.IntegerField(blank=True, null=True)
+    d_value = models.IntegerField(blank=True, null=True)
+
+
+
     # def __str__(self):
     #     retString = ""
     #     if self.file:

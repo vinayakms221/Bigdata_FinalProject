@@ -13,11 +13,111 @@
     <br><br>
     <div id="local-upload" style="display:none">
         <label for="id_local_file_type">File type:</label>
-        <select name="local_file_type" id="id_local_file_type">
+        <select name="local_file_type" id="id_local_file_type" onchange="FiletypeOption(this.value)">
             <option value="csv">CSV</option>
             <option value="json">JSON</option>
             <option value="image">Image</option>
         </select>
+
+
+        <div id="csv_options" style="display:none">
+        <label for="conversion">Choose Operation:</label>
+        <select name="conversion_type" id="conversion_type" onchange="csvtypeOption(this.value)">
+          <option value="TimeSeries">Time Series</option>
+          <option value="ToSQL">To SQL</option>
+          <option value="LinearReg">Linear Regression</option>
+        </select>
+        </div>
+
+        <div id="sql" style="display:none">
+          <label for="collection">Collection Name:</label>
+          <input type="text" name="collection_name" placeholder="Enter Collection name">
+        </div>
+
+        <div id="linear_reg" style="display:none">
+          <label for="axisX">X-axis column name:</label>
+          <input type="text" name="X_axis" placeholder="Enter X axis">
+          <label for="axisY">Y-axis column name:</label>
+          <input type="text" name="Y_axis" placeholder="Enter Y axis">
+        </div>
+
+        
+
+        <div id="time_series" style="display:none">
+          <label for="model">Choose Model:</label>
+          <select name="model_type" id="model_type" onchange="TimeSeriesOption(this.value)">
+            <option value="MovingAvg">Moving Average</option>
+            <option value="Lags">Lags</option>
+            <option value="Leads">Leads</option>
+            <option value="Rolling">Rolling</option>
+            <option value="TimeRegression">Time Regression</option>
+            <option value="Arima">Arima</option>
+          </select>
+          </div>
+
+        <div id="TS_div" style="display:none">
+
+        <div id="moving_avg" style="display:none">
+          <label for="col">Column name:</label>
+          <input type="text" name="column_name" placeholder="Enter Column name">
+          <br>
+          <label for="window_size">Window size:</label>
+          <input type="number" name="window" placeholder="Enter Window size">
+        </div>
+
+        <div id="lags" style="display:none">
+          <label for="col">Column name:</label>
+          <input type="text" name="column_name" placeholder="Enter Column name"><br>
+          <label for="datcol">Data column name:</label>
+          <input type="text" name="data_column_name" placeholder="Enter Data Column name"><br>
+          <label for="lag">Lag Amount:</label>
+          <input type="number" name="lag_amt" placeholder="Enter Lag amount">
+        </div>
+
+        <div id="leads" style="display:none">
+          <label for="col">Column name:</label>
+          <input type="text" name="column_name" placeholder="Enter Column name"><br>
+          <label for="datcol">Data column name:</label>
+          <input type="text" name="data_column_name" placeholder="Enter Data Column name"><br>
+          <label for="lead">Lead Amount:</label>
+          <input type="number" name="lead_amt" placeholder="Enter Lead amount">
+        </div>
+
+        <div id="rolling" style="display:none">
+          <label for="col">Column name:</label>
+          <input type="text" name="column_name" placeholder="Enter Column name"><br>
+          <label for="datcol">Data column name:</label>
+          <input type="text" name="data_column_name" placeholder="Enter Data Column name"><br>
+          <label for="roll">Roll Amount:</label>
+          <input type="number" name="roll_amt" placeholder="Enter Roll amount">
+        </div>
+
+        <div id="timereg" style="display:none">
+          <label for="col">Column name:</label>
+          <input type="text" name="column_name" placeholder="Enter Column name"><br>
+          <label for="datcol">Data column name:</label>
+          <input type="text" name="data_column_name" placeholder="Enter Data Column name"><br>
+          <label for="lag1">lag1 Amount:</label>
+          <input type="number" name="lag1_amt" placeholder="Enter lag1 amount"><br>
+          <label for="lag2">lag2 Amount:</label>
+          <input type="number" name="lag2_amt" placeholder="Enter lag2 amount">
+        </div>
+
+        <div id="arima" style="display:none">
+          <label for="col">Column name:</label>
+          <input type="text" name="column_name" placeholder="Enter Column name"><br>
+          <label for="datcol">Data column name:</label>
+          <input type="text" name="data_column_name" placeholder="Enter Data Column name"><br>
+          <label for="p">p value:</label>
+          <input type="number" name="p_value" placeholder="Enter p value"><br>
+          <label for="q">q value:</label>
+          <input type="number" name="q_value" placeholder="Enter q value"><br>
+          <label for="d">d value:</label>
+          <input type="number" name="d_value" placeholder="Enter d value">
+        </div>
+      </div>
+        
+
         <br><br>
         <input type="file" name="file">
     </div>
@@ -37,6 +137,14 @@
   </form>
   
   <script>
+    document.getElementById("local-upload").style.display = "block";
+    document.getElementById("csv_options").style.display = "block";
+    document.getElementById("time_series").style.display = "block";
+    document.getElementById("moving_avg").style.display = "block";
+    document.getElementById("TS_div").style.display = "block";
+
+    
+
       function handleUploadOption(value) {
           if (value == "local") {
               document.getElementById("local-upload").style.display = "block";
@@ -44,6 +152,92 @@
           } else {
               document.getElementById("local-upload").style.display = "none";
               document.getElementById("url-upload").style.display = "block";
+          }
+      }
+
+      function FiletypeOption(value) {
+          if (value == "csv") {
+              document.getElementById("csv_options").style.display = "block";
+              
+          } else {
+            document.getElementById("csv_options").style.display = "none";
+          }
+      }
+
+      function csvtypeOption(value) {
+          if (value == "TimeSeries") {
+              document.getElementById("time_series").style.display = "block";
+              document.getElementById("TS_div").style.display = "block";
+
+              document.getElementById("sql").style.display = "none";
+              document.getElementById("linear_reg").style.display = "none";
+              
+          } else if (value == "ToSQL")
+          {
+              document.getElementById("time_series").style.display = "none";
+              document.getElementById("TS_div").style.display = "none";
+
+              document.getElementById("sql").style.display = "block";
+              document.getElementById("linear_reg").style.display = "none";
+          }
+          else{
+              document.getElementById("time_series").style.display = "none";
+              document.getElementById("TS_div").style.display = "none";
+
+              document.getElementById("sql").style.display = "none";
+              document.getElementById("linear_reg").style.display = "block";
+          }
+      }
+
+      function TimeSeriesOption(value) {
+          if (value == "MovingAvg") {
+              document.getElementById("moving_avg").style.display = "block";
+              document.getElementById("lags").style.display = "none";
+              document.getElementById("leads").style.display = "none";
+              document.getElementById("rolling").style.display = "none";
+              document.getElementById("timereg").style.display = "none";
+              document.getElementById("arima").style.display = "none";
+
+          } else if (value == "Lags")
+          {
+              document.getElementById("moving_avg").style.display = "none";
+              document.getElementById("lags").style.display = "block";
+              document.getElementById("leads").style.display = "none";
+              document.getElementById("rolling").style.display = "none";
+              document.getElementById("timereg").style.display = "none";
+              document.getElementById("arima").style.display = "none";
+          } else if (value == "Leads")
+          {
+              document.getElementById("moving_avg").style.display = "none";
+              document.getElementById("lags").style.display = "none";
+              document.getElementById("leads").style.display = "block";
+              document.getElementById("rolling").style.display = "none";
+              document.getElementById("timereg").style.display = "none";
+              document.getElementById("arima").style.display = "none";
+          } else if (value == "Rolling")
+          {
+              document.getElementById("moving_avg").style.display = "none";
+              document.getElementById("lags").style.display = "none";
+              document.getElementById("leads").style.display = "none";
+              document.getElementById("rolling").style.display = "block";
+              document.getElementById("timereg").style.display = "none";
+              document.getElementById("arima").style.display = "none";
+          } else if (value == "TimeRegression")
+          {
+              document.getElementById("moving_avg").style.display = "none";
+              document.getElementById("lags").style.display = "none";
+              document.getElementById("leads").style.display = "none";
+              document.getElementById("rolling").style.display = "none";
+              document.getElementById("timereg").style.display = "block";
+              document.getElementById("arima").style.display = "none";
+          }
+          else{
+              document.getElementById("moving_avg").style.display = "none";
+              document.getElementById("lags").style.display = "none";
+              document.getElementById("leads").style.display = "none";
+              document.getElementById("rolling").style.display = "none";
+              document.getElementById("timereg").style.display = "none";
+              document.getElementById("arima").style.display = "block";
           }
       }
   </script>

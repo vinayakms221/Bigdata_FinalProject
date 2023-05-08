@@ -24,7 +24,7 @@ def upload_file(request):
         if 'local' == request.POST['upload_option']:
             
             form = UploadFileForm(request.POST, request.FILES)
-            print("local", form, form.is_valid())
+            # print("local", form, form.is_valid())
             if form.is_valid():
                 file_type = form.cleaned_data['local_file_type']
                 uploaded_file = request.FILES['file']
@@ -33,6 +33,7 @@ def upload_file(request):
                 file_url = fs.url(filename)
                 uploaded_file_obj = UploadedFile(file=filename, local_file_type=file_type)
                 uploaded_file_obj.save()
+                print(request.POST['conversion_type'])
                 return redirect('file_list')
         elif 'url' == request.POST['upload_option']:
             print("url")
