@@ -1,0 +1,28 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>SQL DB connection details</h2>
+<!-- {#    <p><a href="{% url 'upload_file' %}">Upload a new file</a></p>#} -->
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div>
+            <input type="text" name="sql_db_connection" placeholder="Database connection URL">
+            <input type="text" name="sql_db_name" placeholder="Database name">
+            <input type="text" name="sql_username" placeholder="Database Username">
+            <input type="text" name="sql_password" placeholder="Database Password">
+        </div>
+        <br><br>
+        <!-- <input type="file" name="file"> -->
+        <!-- <button type="submit" onclick="displayImage()">Submit</button> -->
+        <button type="submit">Submit</button>
+
+        <br><br>
+
+
+    </form>
+<!-- {#    <a href="{% url '' pk=file.pk %}" class="btn btn-primary">Submit database details</a>#} -->
+
+{% endblock %}
+

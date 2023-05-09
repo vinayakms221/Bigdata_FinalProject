@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Databases</h2>
+  <!-- <p><a href="{% url 'upload_file' %}">Upload a new file</a></p> -->
+  <br>
+  <div style="border: 1px solid gray; padding: 30px; border-radius: 10px;">
+    <div style="display:flex; align-items:center; padding-bottom: 10px;">
+        <p style="margin-right:auto;">SQL DB Info</p>
+        <a href="{% url 'setup_sql_db' %}" class="btn btn-primary" style="float:right; background-color: rgb(9, 132, 9);">Configure SQL DB</a>
+    </div>
+  <table class="table table-bordered text-center"  >
+    <thead>
+      <tr>
+        <th>Table Name</th>
+        <th>Number Records</th>
+        <th>Columns</th>
+        <th></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for file in files %}
+        <tr>
+          <!-- <td><a href="{% url 'file_detail' pk=file.pk %}" class="list-group-item list-group-item-action" >{{ file.file.name }}</td> -->
+          <!-- <td>{{ file.local_file_type|title }}</td> -->
+          <td></td>
+          <td></td>
+          <td><a href="{% url 'file_convert' pk=file.pk %}" class="btn btn-primary">View</a></td>
+          <td><a href="{% url 'file_convert' pk=file.pk %}" class="btn btn-primary">Convert</a></td>
+          <td><a href="{% url 'file_visualize' pk=file.pk %}" class="btn btn-primary">Visualize</a></td>
+        </tr>
+      {% endfor %}
+      {% if files|length == 0 %}
+        <tr>
+          <td colspan="4">No files uploaded yet.</td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+
+<br>
+<br>
+<div style="border: 1px solid gray; padding: 30px; border-radius: 10px;">
+    <div  style="display:flex; align-items:center; padding-bottom: 10px;">
+        <p style="margin-right:auto;">No-SQL DB Info</p>
+        <a href="#" class="btn btn-primary" style="float:right; background-color: rgb(9, 132, 9);">Configure No-SQL DB</a>
+    </div>
+  <table class="table table-bordered text-center" >
+    <thead>
+      <tr>
+        <th>Table Name</th>
+        <th>Number Records</th>
+        <th>Columns</th>
+        <th></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for file in files %}
+        <tr>
+          <!-- <td><a href="{% url 'file_detail' pk=file.pk %}" class="list-group-item list-group-item-action" >{{ file.file.name }}</td> -->
+          <!-- <td>{{ file.local_file_type|title }}</td> -->
+          <td></td>
+          <td></td>
+          <td><a href="#" class="btn btn-primary">View</a></td>
+          <td><a href="{% url 'file_convert' pk=file.pk %}" class="btn btn-primary">Convert</a></td>
+          <td><a href="{% url 'file_visualize' pk=file.pk %}" class="btn btn-primary">Visualize</a></td>
+        </tr>
+      {% endfor %}
+      {% if files|length == 0 %}
+        <tr>
+          <td colspan="4">No files uploaded yet.</td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+<br>
+<br>
+{% endblock %}
+

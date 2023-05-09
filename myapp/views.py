@@ -34,11 +34,32 @@ def file_list(request):
     files = UploadedFile.objects.all()
     return render(request, 'file_list.html', {'files': files})
 
+def db_list(request):
+    files = UploadedFile.objects.all()
+    return render(request, 'db_list.html', {'files': files})
+
 def generate_plot(x,y):
     plt.plot(x,y)
     file_path = os.path.join(settings.MEDIA_ROOT, 'plot.png')
     plt.savefig(file_path)    # fs = FileSystemStorage(location=settings.MEDIA_ROOT)
     # filename = fs.save("plot1.png", img)
+
+
+def setup_sql_db(request):
+    # print(request.POST)
+    print(request.POST)
+    if request.method == 'POST':
+        print("inside post")
+         
+        return redirect('db_list')
+
+
+
+    return render(request, 'setup_sql_db.html')
+
+
+
+
 
 
 
@@ -143,8 +164,6 @@ def file_detail(request, pk):
 def file_convert(request, pk):
     file = get_object_or_404(UploadedFile, pk=pk)
     print(request.POST)
-
-
     return render(request, 'file_convert.html', {'file': file})
 
 
@@ -154,22 +173,17 @@ def file_convert(request, pk):
 def file_visualize(request, pk):
     print(request.POST)
     file = get_object_or_404(UploadedFile, pk=pk)
-
-    # print("abc")
     if request.method == 'POST':
         print("post", request.POST['conversion_type'])
         if (request.POST['conversion_type']== 'TimeSeries'):
                 if (request.POST['model_type']== 'MovingAvg'):
-                    # print(sma(file_url,request.POST['mavg_column_name'],int(request.POST['window'])))
                     x=[1,2,3,4,5]
                     y=[10,20,30,40,80]
-                    generate_plot(x,y)
-
+                    generate_plot(x,y)      
+        form = UploadFileForm(request.POST, request.FILES)  
             
-        form = UploadFileForm(request.POST, request.FILES)
-        # print("local", form, form.is_valid())
-        
         return redirect('plot_img')
+        # return redirect('file_detail', pk)
         
     else:
         form = UploadFileForm()
@@ -185,9 +199,7 @@ def plot_img(request):
 
 
 
-    # Handle other file types here
 
-    return redirect('file_list')
 
 def handle_uploaded_file(file, file_type):
     filename = file.name

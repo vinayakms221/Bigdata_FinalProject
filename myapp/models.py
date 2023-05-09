@@ -10,6 +10,13 @@ class UploadedFile(models.Model):
     username = models.CharField(max_length=255, blank=True, null=True)
     password = models.CharField(max_length=255, blank=True, null=True)
 
+    sql_db_connection =models.CharField(max_length=255, blank=True, null=True)
+    sql_db_name =models.CharField(max_length=255, blank=True, null=True)
+    sql_username =models.CharField(max_length=255, blank=True, null=True)
+    sql_password =models.CharField(max_length=255, blank=True, null=True)
+
+
+
     conversion_type = models.CharField(max_length=10, choices=(('TimeSeries', 'Time Series'), ('ToSQL', 'To SQL'), ('LinearReg', 'Linear Regression')), blank=True, null=True)
     convert_type = models.CharField(max_length=10, choices=(('ToSQL', 'To SQL'), ('ToNOSQL', 'To NOSQL')), blank=True, null=True)
 
