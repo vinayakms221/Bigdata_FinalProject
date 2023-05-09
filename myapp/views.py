@@ -2,6 +2,7 @@ import csv
 import json
 import pandas as pd
 from django.shortcuts import render, redirect,  get_object_or_404
+from statsmodels.tsa.arima.model import ARIMA
 from .forms import UploadFileForm
 from .models import UploadedFile
 from django.conf import settings
@@ -11,37 +12,149 @@ import io
 import numpy as np
 import matplotlib.pyplot as plt
 import zipfile
+from django.urls import reverse
+from datetime import datetime
+import boto3
 
 
-def sma(db, cols, window_size):   
+
+def store_s3(request, pk):
+    aws_access_key_id = 'AKIA4W7FFVFRKSJIONJW'
+    aws_secret_access_key = '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'
+    region_name = 'us-east-1'
+    bucket_name= 'b2photohw2'
+
+    s3 = boto3.client('s3',
+                    aws_access_key_id=aws_access_key_id,
+                    aws_secret_access_key=aws_secret_access_key,
+                    region_name=region_name)
+    media_path = settings.MEDIA_ROOT
+    url=media_path + "\\" + pk+"."+"zip"
+    print(url)
+    with open(url, 'rb') as file:
+        s3.put_object(Bucket=bucket_name, Key=pk+"."+"zip", Body=file)
+
+
+    return render(request, 'store_s3.html')
+
+
+def sma_csv(cols, window_size):   
     # spark = SparkSession.builder.appName("LoadData").getOrCreate()
     # df = spark.read.csv(db, header=True, inferSchema=True)
-    print(db)
-    return db, cols, window_size
+
+    
+
+    # print(db)
+    # return cols, window_size
     # time_rows = df.select(cols).collect()
     # time = [row[cols] for row in time_rows]
+    print(cols)
+    time=cols
+    l = len(time)
+    sma = np.cumsum(time, dtype=float)
+    sma[window_size:] = sma[window_size:] - sma[:-window_size]
+    sma = sma[window_size - 1:] / window_size
+    sma = sma.tolist()
+    for i in range(0,l-len(sma)):
+        sma.insert(0,None)
+    x=[i for i in range(1,len(sma)+1)]
+    y=sma
+    return x,y
+
+def arima(series,p,q,d):
+    model = ARIMA(series, order=(p, q, d))
+    result = model.fit()
+    print(result.summary())
+    predictions = result.predict(start=0, end=len(series)-1)
+    x=[i for i in range(1,len(predictions)+1)]
+    return x,predictions
+
+
+def file_visualize(request, pk):
+    print(request.POST)
+    file = get_object_or_404(UploadedFile, pk=pk)
+
+    content = file.file.read().decode('utf-8')
+    csv_reader = csv.reader(io.StringIO(content))
+    
+    if request.method ==  'POST':
+        print("post", request.POST['conversion_type'])
+        if (request.POST['conversion_type']== 'TimeSeries'):
+                if (request.POST['model_type']== 'MovingAvg'):
+                    column_list = []
+                    header = next(csv_reader) 
+                    print(header) 
+                    ind = header.index(request.POST['mavg_column_name'])
+                    for row in csv_reader:
+                        column_list.append(float(row[ind]))
+                    column_list=column_list[1:]
+                    x,y = sma_csv(column_list,int(request.POST['window']))
+                    generate_plot(x,column_list,y)  
+                
+                if (request.POST['model_type']== 'Arima'):
+                    p=int(request.POST['p_value'])
+                    d=int(request.POST['d_value'])
+                    q=int(request.POST['q_value'])
+                    col = request.POST['arima_column_name']
+                    data_col = request.POST['arima_data_column_name']
+
+                    column_list = []
+                    header = next(csv_reader) 
+                    print(header) 
+                    ind = header.index(col)
+                    for row in csv_reader:
+                        column_list.append(float(row[ind]))
+                    column_list=column_list[1:]
+                    x,y = arima(column_list,p,q,d)
+                    generate_plot(x,column_list,y) 
+
+
+                  
+        form = UploadFileForm(request.POST, request.FILES)  
+            
+        return redirect('plot_img')
+        # return redirect('file_detail', pk)
         
-    # l = len(time)
-    # sma = np.cumsum(time, dtype=float)
-    # sma[window_size:] = sma[window_size:] - sma[:-window_size]
-    # sma = sma[window_size - 1:] / window_size
-    # sma = sma.tolist()
-    # for i in range(0,l-len(sma)):
-    #     sma.insert(0,None)
-    # return sma
+    else:
+        form = UploadFileForm()
+    # return render(request, 'upload_file.html', {'form': form})
+    return render(request, 'file_visualize.html', {'file': file,'form': form })
 
 def file_list(request):
     files = UploadedFile.objects.all()
-    return render(request, 'file_list.html', {'files': files})
+    media_path = settings.MEDIA_ROOT
+    dirs=[]
+    for (dirpath, dirnames, filenames) in os.walk(media_path):
+        if os.path.basename(dirpath).endswith(".zip"):
+            # Ignore zip folders
+            continue
+        for dir_name in dirnames:
+            if not dir_name.endswith(".zip"):
+                dir_path = os.path.join(dirpath, dir_name)
+                dir_time = datetime.fromtimestamp(os.path.getmtime(dir_path))
+                dir_time = dir_time.strftime('%b %d, %Y %H:%M:%S')
+                dirs.append({'name': dir_name, 'url': dir_path, 'size': '-', 'time': dir_time, 'type': 'directory'})
+    print(dirs)
+
+    return render(request, 'file_list.html', {'files': files, 'dirs':dirs})
 
 def db_list(request):
     files = UploadedFile.objects.all()
     return render(request, 'db_list.html', {'files': files})
 
-def generate_plot(x,y):
-    plt.plot(x,y)
-    file_path = os.path.join(settings.MEDIA_ROOT, 'plot.png')
-    plt.savefig(file_path)    # fs = FileSystemStorage(location=settings.MEDIA_ROOT)
+def generate_plot(x,y1,y2):
+    if y2==None:
+        plt.plot(x,y1)
+        file_path = os.path.join(settings.MEDIA_ROOT, 'plot.png')
+        plt.savefig(file_path)   
+        plt.clf()
+    else:
+        plt.plot(x,y1)
+        plt.plot(x,y2)
+        file_path = os.path.join(settings.MEDIA_ROOT, 'plot.png')
+        plt.savefig(file_path)   
+        plt.clf()
+     # fs = FileSystemStorage(location=settings.MEDIA_ROOT)
     # filename = fs.save("plot1.png", img)
 
 
@@ -56,10 +169,6 @@ def setup_sql_db(request):
 
 
     return render(request, 'setup_sql_db.html')
-
-
-
-
 
 
 
@@ -78,13 +187,14 @@ def upload_file(request):
                 file_type = form.cleaned_data['local_file_type']
                 if(file_type == 'image'):
                     uploaded_file = request.FILES['file']
+                    print(uploaded_file)
                     fs = FileSystemStorage(location=settings.MEDIA_ROOT)
-                    # with zipfile.ZipFile(uploaded_file, 'r') as zip_ref:
-                        # zip_ref.extractall(settings.MEDIA_ROOT)
+                    with zipfile.ZipFile(uploaded_file, 'r') as zip_ref:
+                        zip_ref.extractall(settings.MEDIA_ROOT)
                     filename = fs.save(uploaded_file.name, uploaded_file)
                     file_url = fs.url(filename)
-                    uploaded_file_obj = UploadedFile(file=filename, local_file_type=file_type)
-                    uploaded_file_obj.save()
+                    # uploaded_file_obj = UploadedFile(file=filename, local_file_type=file_type)
+                    # uploaded_file_obj.save()
                     
 
                 else:
@@ -170,25 +280,7 @@ def file_convert(request, pk):
 
 
 
-def file_visualize(request, pk):
-    print(request.POST)
-    file = get_object_or_404(UploadedFile, pk=pk)
-    if request.method == 'POST':
-        print("post", request.POST['conversion_type'])
-        if (request.POST['conversion_type']== 'TimeSeries'):
-                if (request.POST['model_type']== 'MovingAvg'):
-                    x=[1,2,3,4,5]
-                    y=[10,20,30,40,80]
-                    generate_plot(x,y)      
-        form = UploadFileForm(request.POST, request.FILES)  
-            
-        return redirect('plot_img')
-        # return redirect('file_detail', pk)
-        
-    else:
-        form = UploadFileForm()
-    # return render(request, 'upload_file.html', {'form': form})
-    return render(request, 'file_visualize.html', {'file': file,'form': form })
+
 
 def plot_img(request):
     return render(request, 'plot_img.html')
@@ -197,7 +289,15 @@ def plot_img(request):
 
 
 
-
+def image_list(request, folder):
+    folder_path = os.path.join(settings.MEDIA_ROOT, folder)
+    images = os.listdir(folder_path)
+    images = [image for image in images if not image.endswith('.zip')]
+    context = {
+        'folder': folder,
+        'images': images,
+    }
+    return render(request, 'image_list.html', context)
 
 
 

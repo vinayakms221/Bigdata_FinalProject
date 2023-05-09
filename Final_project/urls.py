@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from myapp.views import file_list, upload_file, file_detail, file_convert, file_visualize, plot_img, db_list, setup_sql_db
+from myapp.views import file_list, upload_file, file_detail, file_convert, file_visualize, plot_img, db_list, setup_sql_db, store_s3
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -30,4 +30,5 @@ urlpatterns = [
     path('visualize/<int:pk>/', file_visualize, name='file_visualize'),
     path('plot/', plot_img, name='plot_img'),
     path('sqlform/', setup_sql_db, name='setup_sql_db'),
+    path('success/<str:pk>/', store_s3, name='store_s3'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -25,16 +25,49 @@
           {% if file.local_file_type == 'csv' %}
             <td><a href="{% url 'file_detail' pk=file.pk %}">{{ file.file }}</a></td>
             <td>{{ file.local_file_type|title }}</td>
+            <td>{{ file.file.size|filesizeformat }}</td>
+            <td>{{ file.uploaded_at|date:"M d, Y H:i:s" }}</td>
+            <td><a href="{% url 'file_convert' pk=file.pk %}" class="btn btn-primary">Convert</a></td>
+            <td><a href="{% url 'file_visualize' pk=file.pk %}" class="btn btn-primary">Visualize</a></td>
           {% elif file.local_file_type == 'image' %}
             <td><a href="{% url 'file_detail' pk=file.pk %}">{{ file.file }}</a></td>
             <td>Folder</td>
+            <td>{{ file.file.size|filesizeformat }}</td>
+            <td>{{ file.uploaded_at|date:"M d, Y H:i:s" }}</td>
+            <td><a href="{% url 'file_convert' pk=file.pk %}" class="btn btn-primary">Convert</a></td>
+            <td><a href="{% url 'file_visualize' pk=file.pk %}" class="btn btn-primary">Visualize</a></td>
+
+            
+
           {% endif %}
-          <td>{{ file.file.size|filesizeformat }}</td>
-          <td>{{ file.uploaded_at|date:"M d, Y H:i:s" }}</td>
-          <td><a href="{% url 'file_convert' pk=file.pk %}" class="btn btn-primary">Convert</a></td>
-          <td><a href="{% url 'file_visualize' pk=file.pk %}" class="btn btn-primary">Visualize</a></td>
+
+          <!-- <td>{{ file.file.size|filesizeformat }}</td>
+            <td>{{ file.uploaded_at|date:"M d, Y H:i:s" }}</td> -->
+            <!-- <td><a href="{% url 'file_convert' pk=file.pk %}" class="btn btn-primary">Convert</a></td> -->
+            <!-- <td><a href="{% url 'file_visualize' pk=file.pk %}" class="btn btn-primary">Visualize</a></td> -->
+          </tr>
+          {% endfor %}
+          
+          {% for dir in dirs %}
+            <tr>
+              <td>{{ dir.name }}</td>
+              <td>Image Folder</td>
+              <td>{{dir.size}}</td>
+              <td>{{dir.time}}</td>
+              <td><a href="{% url 'store_s3' pk=dir.name %}" class="btn btn-primary">Store</a></td>
+              <td><a href="#  " class="btn btn-primary">Compress</a></td>
+
+            </tr>
+            {% endfor %}
+      <!-- {% for dir in dirs %}
+        <tr>
+          <td>{{ dir.name }}</td>
         </tr>
-      {% endfor %}
+
+      {% endfor %} -->
+
+
+
       {% if files|length == 0 %}
         <tr>
           <td colspan="4">No files uploaded yet.</td>
